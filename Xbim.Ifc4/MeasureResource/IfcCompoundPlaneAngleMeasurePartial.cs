@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Xbim.Ifc4.MeasureResource
 {
-    public partial struct IfcCompoundPlaneAngleMeasure
+    public partial struct IfcCompoundPlaneAngleMeasure : IEnumerable<long>
     {
         public double AsDouble
         {
@@ -26,12 +27,22 @@ namespace Xbim.Ifc4.MeasureResource
         public static IfcCompoundPlaneAngleMeasure FromDouble(double degreeAngle)
         {
             int measure1; int measure2; int measure3; int measure4;
-            measure1 = (int)degreeAngle;       //round to int value                               
-            measure2 = (int)(degreeAngle - measure1) * 60;
-            measure3 = (int)((degreeAngle - measure1) * 60 - measure2) * 60;
-            measure4 = (int)((((degreeAngle - measure1) * 60 - measure2) * 60 - measure3) * 1e6);
+            measure1 = (int)degreeAngle;       //integer part                              
+            measure2 = (int)((degreeAngle - measure1) * 60);
+            measure3 = (int)((((degreeAngle - measure1) * 60) - measure2) * 60);
+            measure4 = (int)((((((degreeAngle - measure1) * 60) - measure2) * 60) - measure3) * 1e6);
             var vals = new List<long>() { measure1, measure2, measure3, measure4 };          
             return new IfcCompoundPlaneAngleMeasure(vals);
+        }
+
+        public IEnumerator<long> GetEnumerator()
+        {
+            return _value.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
